@@ -1,77 +1,142 @@
 import React from 'react';
-import { Tab, Theme, LinearProgress, Container, Paper, Box } from '@material-ui/core';
-import { makeStyles, CircularProgress, Typography, Backdrop, Button } from '@material-ui/core';
-
-import LinearProgressWithLabel from './label';
+import { Paper, Slider } from '@material-ui/core';
+import { Typography, createTheme, ThemeProvider } from '@material-ui/core';
+import { LinearProgressWithLabel, CircularProgressWithLabel }from './label';
 /* Plant */
 import plant from './plant.png';
 import plant2 from './plant2.png';
+import RadialProgress from '../d3Circle';
 
 
-const useStyles = makeStyles((theme: Theme) => ({
-  outerWrapper: {
-    /* display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center' */
-  },
-  tableContainer: {
-    padding: theme.spacing(5),
-    display: 'flex',
-    justifyContent: 'center',
-    height: '30%',
-    /* backgroundColor: "red", */
-    width:'50%'
-  },
-  nameDisplay: {
-    fontSize:36,
-    color:"white",
-  },
-  plantDisplay:{
-    width: '70%',
-    padding: theme.spacing(5)
-  },
-  paperDisplay: {
-    maxWidth: '100%',
-    maxHeight: '100%',
-    backgroundColor: "#094B5A",
-    borderRadius: 15,
-    padding: theme.spacing(5)
-  },
-  progressDisplay:{
-    borderRadius:15,
-    marginTop:10,
-    paddingTop:10
-  },
-  circularDisplay:{
-    height: 500,
-    width: 500
-  }
-}));
+import * as d3 from 'd3';
 
 const plantLevelMap = {
   1: plant,
   2: plant2
 }
 
-
-const Plant = ({progressPercent, level}) => {
+const Plant = ({progressPercent, level, s = 360}) => {
   const [lvl, setLvl] = React.useState(1);
-  const classes = useStyles();
-  /* const classes = useStyles(); */
-//   const [value, setValue] = React.useState('1');
-//   const handleChange = (event: React.ChangeEvent<{}>, newValue: string) => {
-//     setValue(newValue);
-//   };
+  const [size, setSize] = React.useState(s);
+  const [count, setCount] = React.useState(50);
+  const [previousState, setPrev] = React.useState(count);
 
+  let value = 0;
+
+  const styles = {
+    innerContainer: {
+      position: 'relative',
+      width: size,
+      display: 'flex',
+      justifyContent: 'center'
+    },
+    plantWrapper: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      width: 'min-content', /*  */
+      background: "white",
+      borderRadius: 16,
+      padding: 24,
+      color: 'white'
+    },
+    innerPlantWrapper: {
+      margin: size / 3
+    },
+    linearDisplay: {
+      width: '100%',
+      borderRadius: 10
+    },
+    imageStyle: {
+      width: '100%'
+    },
+    typoThemes: {
+      fontFamily: 'IBM Plex Sans'
+    }
+  }
+
+  const progStyles = {
+    widget: {
+      position: 'absolute',
+      top: -size / 3.1 /* Offset of the circle from the top of the container */
+    },
+    progressbar: {
+      fill: '#84a5ac'
+    },
+    progressbar2: {
+      fill: '#84a5ac'
+    },
+    progressbarbg: {
+      fill: '#ddd'
+    },
+    progressbarcirc: {
+      fill: '#ddd'
+    },
+    progresslabel: {
+      textAlign: "center",
+      fill: '#aaa',
+      fontFamily: 'Open Sans',
+      fontSize: '20px',
+      textAnchor: 'middle',
+      dominantBaseline: 'central'
+    }
+  }
+
+  const theme = createTheme({
+    typography: {
+      subtitle1: {
+        fontSize: 12,
+      },
+      body1: {
+        fontWeight: 500,
+      },
+      button: {
+        fontStyle: 'italic',
+      },
+    },
+  });
+  /* console.log("currentState" + count);
+  console.log("previousState" + previousState) */
   return (
-    <Container className={classes.tableContainer}>
-      <Paper className={classes.paperDisplay} color="primary">
-        <div className={classes.nameDisplay}>Andy's Plant</div>
-        <img className={classes.plantDisplay} src={plantLevelMap[level]}/>
-        <LinearProgressWithLabel className={classes.progressDisplay} variant="determinate" color="primary" value={progressPercent} />
-      </Paper>
-    </Container> 
+    <Paper style={styles.plantWrapper} elevation={12}>
+      <button onClick={() => setCount(count + 10)}>click me</button>
+      <ThemeProvider theme={theme}>
+        <Typography variant='body1'> Andy's Plant </Typography>
+      </ThemeProvider>
+      <div style={styles.innerPlantWrapper}>
+        <div style={styles.innerContainer}>
+          <RadialProgress 
+            progSty={progStyles} 
+            width={size * 1.75} 
+            height={size * 1.65} 
+            thickness={size / 15}
+            value={count}
+            valPrev={previousState}
+            setprev={(input) => setPrev(input)}
+          />
+          <img 
+            src={plantLevelMap[lvl]}
+            style={styles.imageStyle}
+          ></img>
+        </div>
+      </div>
+      <LinearProgressWithLabel 
+            style={styles.linearDisplay}
+            variant="determinate"
+            value={progressPercent}
+            thickness={2}
+            size={1.5 * size}
+          />
+      <Slider
+        onChange={(_, value) => setSize(value)}
+        value={size}
+        min={100}
+        max={800}
+        style={{ width: 400, marginTop: 40 }}
+      />
+    </Paper>
   );
+  /* Remove slider when done debugging responsiveness */
 };
 
 export default Plant;
