@@ -1,10 +1,9 @@
 import React from 'react';
 import { Paper, Slider } from '@material-ui/core';
-import { Typography, createTheme, ThemeProvider, CircularProgress, withStyles } from '@material-ui/core';
-import { LinearProgressWithLabel }from './label';
+import { Typography, createTheme, ThemeProvider, CircularProgress, LinearProgress } from '@material-ui/core';
 /* Plant */
-import plant from './plant.png';
-import plant2 from './plant2.png';
+import plant from './imgsrc/plant.png';
+import plant2 from './imgsrc/plant2.png';
 import NumberEasing from 'react-number-easing';
 
 const plantLevelMap = {
@@ -12,14 +11,11 @@ const plantLevelMap = {
   2: plant2
 }
 
-const Plant = ({progressPercent, level, s = 360}) => {
+const Plant = ({progressPercent = 25, level, s = 360}) => {
   const [lvl, setLvl] = React.useState(1);
   const [size, setSize] = React.useState(s);
-  const [count, setCount] = React.useState(50);
-  const [previousState, setPrev] = React.useState(count);
 
   let value = 0;
-  progressPercent = count;
   
   const styles = {
     innerContainer: {
@@ -32,7 +28,7 @@ const Plant = ({progressPercent, level, s = 360}) => {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      width: 'min-content', /*  */
+      width: 'min-content',
       background: "white",
       borderRadius: 16,
       padding: 24,
@@ -42,7 +38,9 @@ const Plant = ({progressPercent, level, s = 360}) => {
       margin: size / 3
     },
     linearDisplay: {
-      width: '100%',
+      display: 'flex',
+      position: 'relative',
+      width: 'auto',
       borderRadius: 10
     },
     imageStyle: {
@@ -98,6 +96,8 @@ const Plant = ({progressPercent, level, s = 360}) => {
         fontSize: 12,
       },
       body1: {
+        fontSize: '36px',
+        color: '#84a5ac',
         fontWeight: 500,
       },
       button: {
@@ -106,54 +106,10 @@ const Plant = ({progressPercent, level, s = 360}) => {
     },
   });
 
-  // Global overrides for circle
-  /* const GlobalCss = withStyles({
-    // @global is handled by jss-plugin-global.
-    '@global': {
-      // You should target [class*="MuiButton-root"] instead if you nest themes.
-      '.MuiCircularProgress-circleDeterminate': {
-        transitionProperty: 'stroke-dashoffset',
-        transitionDuration: '1.5s',
-        transitionTimingFunction: 'ease-in-out',
-        transitionDelay: '1s'
-      },
-    },
-  })(CircularProgress); */
-  /* const StyledButton = withStyles({
-    root: {
-      background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
-      borderRadius: 3,
-      border: 0,
-      color: 'white',
-      height: 48,
-      padding: '0 30px',
-      boxShadow: '0 3px 5px 2px rgba(255, 105, 135, .3)',
-    },
-    label: {
-      textTransform: 'capitalize',
-    },
-  })(CircularProgress); */
-
-  /* const CircularProg = withStyles({
-      circleDeterminate: {
-        transitionProperty: 'transform',
-        transitionDuration: '1.5s',
-        transitionTimingFunction: 'ease-in-out',
-        transitionDelay: '1s'
-        transition: theme.transitions.create('stroke-dashoffset')
-      },
-    },
-  )(CircularProgress); */
-  
-  /* const styles = makeStyles()
-  // … */
-  
-
   const thickness = 2.5;
   return (
     <Paper style={styles.plantWrapper} elevation={12}>
 
-      <button onClick={() => setCount(count + 11)}>click me</button>
       <ThemeProvider theme={theme}>
         <Typography variant='body1'> Andy's Plant </Typography>
       </ThemeProvider>
@@ -176,8 +132,6 @@ const Plant = ({progressPercent, level, s = 360}) => {
                 size={size * 1.5}
               />
           </div>
-        
-      
           <img 
             src={plantLevelMap[lvl]}
             style={styles.imageStyle}
@@ -190,31 +144,32 @@ const Plant = ({progressPercent, level, s = 360}) => {
                 variant='body1'
                 className='progress-label' 
                 style={progStyles.progresslabel}>
-                <NumberEasing value={count} speed={400} decimals={0} ease="cubicInOut" />
+                <NumberEasing value={progressPercent} speed={400} decimals={0} ease="cubicInOut" />
               </Typography>
           </ThemeProvider>
         </div>
+          
       </div>
+      
+      <LinearProgress
+          variant="determinate"
+          value={progressPercent}
+          thickness={thickness}
+          style={{ width: 400, marginTop: 30, marginBottom: 30 }}
+        />
 
-      <LinearProgressWithLabel 
-            style={styles.linearDisplay}
-            variant="determinate"
-            value={progressPercent}
-            thickness={2}
-            size={1.5 * size}
-          />
-
-      <Slider
+    </Paper>
+  );
+  /* DEBUG -----------------
+  <Slider
         onChange={(_, value) => setSize(value)}
         value={size}
         min={100}
         max={800}
         style={{ width: 400, marginTop: 40 }}
       />
-
-    </Paper>
-  );
-  /* Remove slider when done debugging responsiveness */
+  
+  --------------------------- */
 };
 
 export default Plant;

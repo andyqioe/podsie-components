@@ -16,7 +16,8 @@ const useStyles = makeStyles((theme) => ({
     padding: 50,
     borderRadius: 15,
     display: 'flex',
-    flexDirection: 'column'
+    flexDirection: 'column',
+    alignItems: 'center'
   },
   regularPrint: {
     color: '#fff',
@@ -32,6 +33,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
+// Props should return a true or false tag depending on whether the question
+// Is correct or wrong.
 
 export default function SimpleBackdrop(props) {
   const classes = useStyles();
@@ -40,15 +43,15 @@ export default function SimpleBackdrop(props) {
   const handleClose = props.close
   const handleToggle = props.toggle
 
-  const Success = () => {return (<Paper className={classes.paperStyle}>
-  <span className={classes.regularPrint}> That's correct! You've gained 10 xp. </span>
-  <span className={classes.finePrint}> Click anywhere to continue. </span>
-</Paper>)}
-
-  const Failed = () => {return (<Paper className={classes.paperStyle}>
-    <span className={classes.regularPrint}> Oops, that doesn't look right! You've gained 5 xp for your efforts </span>
+    const Success = () => {return (<Paper className={classes.paperStyle}>
+    <span className={classes.regularPrint}> That's correct! You've gained 10 xp. </span>
     <span className={classes.finePrint}> Click anywhere to continue. </span>
   </Paper>)}
+
+    const Failed = () => {return (<Paper className={classes.paperStyle}>
+      <span className={classes.regularPrint}> Oops, that doesn't look right! You've gained 5 xp for your efforts </span>
+      <span className={classes.finePrint}> Click anywhere to continue. </span>
+    </Paper>)}
 
   return (
     <div>

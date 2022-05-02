@@ -2,7 +2,8 @@ import { useState } from 'react'
 import logo from './logo.svg'
 import './App.css'
 import Plant from './components/Plant'
-import SimpleBackdrop from './components/onSubmit/onSubmit'; 
+import SimpleBackdrop from './components/Backdrop'; 
+import Analytics from './components/Analytics';
 import { Slider } from '@material-ui/core'
 
 
@@ -37,10 +38,11 @@ function App() {
 
   return (
     <div style={tmpStyle.tmp}>
-      <Plant progressPercent={count} level={plantLvl}/> 
+     {/* <SimpleBackdrop toggle={() => countOrLevel()} close={() => {setOpen(false)}} isOpen={open} /> */}
+     <Analytics />
     </div>
   )
-  /* <SimpleBackdrop toggle={() => countOrLevel()} close={() => {setOpen(false)}} isOpen={open} /> */
+  
   /* // Circular Component
   return (
     <div className="App">
