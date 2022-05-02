@@ -25,7 +25,6 @@ function App() {
   }
 
   // Delete and remove from div when done.
-  const [siz, setSize] = useState(360);
   const tmpStyle = {
     tmp: {
       display: 'flex',

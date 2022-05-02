@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 /* import { useFocusEffect } from '@react-navigation/native' */
 import * as d3 from 'd3';
 
+
 export default function RadialProgress(props) {
   const [tmp, setTmp] = useState(props.prev);
 
@@ -11,44 +12,63 @@ export default function RadialProgress(props) {
 
   const mainArc = d3.arc()
     .startAngle(Math.PI)
-    .endAngle(-Math.PI)
+    .endAngle(3 * Math.PI)
     .innerRadius(outerRadius-thickness)
     .outerRadius(outerRadius)
 
   // UseEffect hook updates the D3 animations
+  // Current code is a bit complex, looking to simplify in near future
+  //--------------------------------------------------------------------------------
   useEffect(() => {
-    const previousValue = props.valPrev;
-    const startValue = props.value;
-    const endAngle = Math.PI * startValue / 50;
-    const startAngle = Math.PI * previousValue / 50
-    const angleDiff = endAngle - startAngle;
+    const startValue = props.valPrev;
+    const endValue = props.value;
+    const endAngle = Math.PI * (endValue) / 50;
+    const startAngle = Math.PI * (startValue) / 50
+    const angleDiff = endAngle - startAngle; /* prev value is 99, and new value is 1, then we need to subtract a whole 2pi */
     const startAngleDeg = startAngle / Math.PI * 180
     const angleDiffDeg = angleDiff / Math.PI * 180
     const transitionDuration = 1500
-    d3.select(".progress-bar").transition().duration(transitionDuration).attrTween('d', function(){
+
+    // Progress-bar body motion
+    d3.select(".progress-bar")
+      .transition()
+      .duration(transitionDuration)
+      .attrTween('d', function(){
         return function(t) {
-          mainArc.endAngle(startAngle + angleDiff * t)
+          const v = startAngle + angleDiff * t
+          if ((v >= (3 * Math.PI)) && ((v % (3*Math.PI)) > 0)) 
+            mainArc.endAngle(v % (2 * Math.PI));
+          else
+            mainArc.endAngle(v);
         return mainArc();
         }
     })
-    d3.select(".progress-bar2").transition().duration(transitionDuration).attrTween('transform', function(){
-        return function(t) {
-        return `translate(${props.width/2},${props.height/2})`+
-          `rotate(${(startAngleDeg + angleDiffDeg * t)})`+
-          `translate(0,-${outerRadius-thickness/2})`
-        }
-    })
-    /* Label */
-    /* 
-      percentLabel.transition().duration(transitionDuration).tween('bla', function() {
+    // Progress-bar circle motion
+    d3.select(".progress-bar2")
+        .transition()
+        .duration(transitionDuration)
+        .attrTween('transform', function() {
           return function(t) {
-            percentLabel.text(Math.round(startValue + (progressPercent - startValue) * t));
-          }
-          })
-    */
-    props.setprev(startValue);
+          return `translate(${props.width/2},${props.height/2})`+
+            `rotate(${(startAngleDeg + angleDiffDeg * t)})`+
+            `translate(0,-${outerRadius-thickness/2})`
+          }}
+    )
+    // Label
+    d3.select('.progress-label')
+      .transition()
+      .duration(transitionDuration)
+      .tween('bla', function() {
+        return function(t) {
+          d3.select('.progress-label')
+            .text(Math.round((startValue + (endValue - startValue) * t) - 50) % 100);
+      }
+    })
+    // Sets the previous state so we can use
+    props.setprev(endValue);
   }, [props.value]) 
-// Second input is the dependency array, causes useEffect to not fire twice when we call setState
+  // Second input is the dependency array, causes useEffect to not fire twice when we call setState
+  //--------------------------------------------------------------------------------
 
   return (
       <div className="widget" style={styles.widget} width={props.width} height={props.height}>
